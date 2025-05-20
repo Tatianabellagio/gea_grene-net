@@ -1,0 +1,15 @@
+# Ignore everything
+*
+
+# Allow all directories to be traversed
+!*/
+
+# Then allow only specific file types
+!.gitignore
+!*.py
+!*.R
+!*.r
+!*.Rscript
+!*.ipynb
+!*.yml
+!*.pkl

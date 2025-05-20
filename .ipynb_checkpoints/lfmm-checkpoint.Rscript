@@ -1,0 +1,79 @@
+library("vcfR")
+library("dplyr")
+library("LEA")
+
+#path_metadata = '/home/tbellagio/grene/data/'
+env_data_ecotypes <- read.csv('/home/tbellagio/grene/data/worldclim_ecotypesdata.csv')
+# Select only the required columns
+env_data_ecotypes <- select(env_data_ecotypes, ecotypeid, bio1)
+
+ld_prunned_vcf_file = '/carnegie/nobackup/scratch/xwu/grenet/hapFIRE_updatedVCF/greneNet_final_v1.1_LDpruned.recode.vcf'
+vcf_file_path = '/carnegie/nobackup/scratch/xwu/grenet/hapFIRE_updatedVCF/greneNet_final_v1.1.recode.vcf'
+
+vcf_full <- read.vcfR(ld_prunned_vcf_file)
+geno_full <- vcf_full@gt[,-1] 
+
+##take the sample names from teh vcf file to cehck the order 
+sample_names <- colnames(vcf_full@gt)[-1]
+sample_names <- as.character(sample_names)
+
+## order the environemtnal file based on the order in the genotype file 
+env_data_ecotypes$ecotypeid <- as.character(env_data_ecotypes$ecotypeid)
+
+env_data_ecotypes_ordered <- env_data_ecotypes[match(sample_names, env_data_ecotypes$ecotypeid), ]
+
+###################### DELETE THIS IN THE FUTURE ######################
+env_data_ecotypes_ordered[is.na(env_data_ecotypes_ordered)] <- 0
+###################### DELETE THIS IN THE FUTURE ######################
+
+## now that is ordered extract only the enviornmental variable 
+env_variable = env_data_ecotypes_ordered$bio1
+
+env_variable = matrix(env_variable)
+
+
+
+
+
+
+G_full <- matrix(NA, nrow = nrow(geno_full), ncol = ncol(geno_full))
+
+G_full[geno_full %in% c("0/0", "0|0")] <- 0
+G_full[geno_full  %in% c("0/1", "1/0", "1|0", "0|1")] <- 1
+G_full[geno_full %in% c("1/1", "1|1")] <- 2
+
+
+
+
+experimental_sites_climate <- read.csv('/home/tbellagio/grene/data/worldclim_sitesdata.csv')
+
+# Select only the required columns
+experimental_sites_climate <- select(experimental_sites_climate, site, bio1)
+
+experimental_sites_bio1 = experimental_sites_climate$bio1
+
+experimental_sites_bio1 = matrix(experimental_sites_bio1)
+
+new_env = matrix(experimental_sites_bio1[1,] , nrow = nrow(env_variable) , ncol = 1)
+
+
+
+G_full = t(G_full)
+
+print(dim(G_full))  # Should be 13985 x 231 for 'input'
+print(dim(env_variable))   # Should be 231 x 1 for 'env'
+print(dim(new_env))  
+ 
+
+pop <- matrix(1:231, nrow = 231, ncol = 1)
+g.offset <- genetic.offset(input = G_full,
+                        env = env_variable,
+                        pred.env = new_env, 
+                        pop.labels = pop,
+                        pca = 30, 
+                       )
+          
+write.table(g.offset, file = "/carnegie/nobackup/scratch/tbellagio/gea_grene-net/g_offset.txt", sep = ",", row.names = FALSE, col.names = TRUE)
+
+
+             

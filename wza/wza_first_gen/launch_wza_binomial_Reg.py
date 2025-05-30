@@ -9,10 +9,9 @@ It processes the regression results, adds MAF information, and submits the analy
 
 Required Files:
 1. Input Files:
-   - ../key_files/var_pos_grenenet.csv: SNP position information
-   - ../key_files/blocks_snpsid_dict.pkl: Dictionary mapping SNP IDs to block IDs
-   - ../binomial_regression/binomial_reg_results_{biovar}.csv: Binomial regression results
-   - ../key_files/maf_all_samples.csv: Minor allele frequencies
+   - ../data/var_pos_grenenet.csv: SNP position information
+   - ../data/blocks_snpsid_dict.pkl: Dictionary mapping SNP IDs to block IDs
+   - ../data/maf_all_samples.csv: Minor allele frequencies
 
 2. Script Files:
    - general_WZA_script_mod_polynomial_order7.py: WZA analysis script
@@ -45,12 +44,19 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import pickle
 
-# --- Load SNP Names and Block Mapping ---
-print("Loading SNP names and block mapping...")
-snps_names = pd.read_csv('../key_files/var_pos_grenenet.csv')
+# --- Configuration and File Paths ---
+# Path to input files
+snps_names = pd.read_csv('../data/var_pos_grenenet.csv')
 
-with open('../key_files/blocks_snpsid_dict.pkl', 'rb') as f:
+# Load block-SNP mapping dictionary
+with open('../data/blocks_snpsid_dict.pkl', 'rb') as f:
     dict_blocks = pickle.load(f)
+
+# Load MAF data
+maf = pd.read_csv('../data/maf_all_samples.csv')
+
+# Path to working directory
+path = './wza'
 
 # Create reverse mapping from SNP ID to block ID
 reverse_mapping = {item: key for key, values in dict_blocks.items() for item in values}
@@ -68,7 +74,6 @@ binomial_reg['block'] = binomial_reg['snp_id'].map(reverse_mapping)
 
 # Add MAF information
 print("Adding MAF information...")
-maf = pd.read_csv('../key_files/maf_all_samples.csv')
 binomial_reg = pd.concat([binomial_reg, maf], axis=1)
 
 # Rename columns for clarity
@@ -80,7 +85,6 @@ binomial_reg.to_csv(f'../binomial_regression/binomial_reg_wmaf_{biovar}.csv', in
 
 # --- Create and Submit SLURM Job ---
 print("Creating SLURM job script...")
-path = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/wza'
 shfiles = []
 
 # Create SLURM job script

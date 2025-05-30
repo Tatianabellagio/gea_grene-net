@@ -15,8 +15,8 @@ and submits these scripts to a Slurm cluster scheduler using `sbatch`.
 Inputs:
 - Processed GEMMA results files: `/carnegie/nobackup/scratch/tbellagio/gea_grene-net/gwas/fitness_gwas/site_*/output/results_lmm.csv`
 - The WZA script: `general_WZA_script_mod_polynomial_order7.py` (assumed to be in the same directory or accessible in the PATH)
-- ../../key_files/bioclimvars_experimental_sites_era5.csv: Climate data for experimental sites (used for downstream analysis/plotting, not for launching WZA).
-- ../../key_files/blocks_snpsid_dict.pkl: Pickle file containing a dictionary mapping SNP IDs to block IDs (used for downstream analysis/plotting, not for launching WZA).
+- ../../data/bioclimvars_experimental_sites_era5.csv: Climate data for experimental sites (used for downstream analysis/plotting, not for launching WZA).
+- ../../data/blocks_snpsid_dict.pkl: Pickle file containing a dictionary mapping SNP IDs to block IDs (used for downstream analysis/plotting, not for launching WZA).
 
 Outputs:
 - For each site: `/carnegie/nobackup/scratch/tbellagio/gea_grene-net/gwas/fitness_gwas/wza_site_<site_id>.sh`: SBATCH script for running WZA.
@@ -39,16 +39,16 @@ import pickle
 
 # --- Configuration and File Paths ---
 # Path to the base directory containing site-specific GEMMA results
-gemma_results_base_path = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/gwas/fitness_gwas'
+gemma_results_base_path = '.'
 
 # Name of the WZA script
 wza_script_name = 'general_WZA_script_mod_polynomial_order7.py'
 
 # Path to climate data (for downstream analysis/plotting)
-climate_file = '../../key_files/bioclimvars_experimental_sites_era5.csv'
+climate_file = '../../data/bioclimvars_experimental_sites_era5.csv'
 
 # Path to blocks dictionary (for downstream analysis/plotting)
-blocks_dict_file = '../../key_files/blocks_snpsid_dict.pkl' # Using relative path based on common file location
+blocks_dict_file = '../../data/blocks_snpsid_dict.pkl' # Using relative path based on common file location
 
 # --- Helper Function to List Site Directories ---
 def list_only_directories(path):

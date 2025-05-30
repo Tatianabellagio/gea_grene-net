@@ -34,9 +34,12 @@ import os
 import subprocess 
 import random
 
+# --- Configuration ---
+# Path to climate data file
+climate_file = '../../data/bioclimvars_ecotypes_era5.csv'
+
 # --- Load Climate Data ---
 print("Loading climate data...")
-climate_file = '../../key_files/bioclimvars_ecotypes_era5.csv'
 climate = pd.read_csv(climate_file)
 
 # Rename columns to include all bioclimatic variables

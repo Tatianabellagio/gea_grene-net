@@ -41,6 +41,10 @@ import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
+# --- Configuration and File Paths ---
+# Path to working directory
+path = './wza'
+
 # --- Set Bioclimatic Variable ---
 biovar = 'bio18'  # Can be modified for different bioclimatic variables
 
@@ -50,7 +54,6 @@ kendall_corr = pd.read_csv(f'../kendall_tau/kendall_corr_{biovar}.csv')
 
 # --- Create and Submit SLURM Job ---
 print("Creating SLURM job script...")
-path = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/wza'
 shfiles = []
 
 # Create SLURM job script

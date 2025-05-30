@@ -9,11 +9,11 @@ It processes the LFMM results, adds MAF information, and creates visualization p
 
 Required Files:
 1. Input Files:
-   - ../key_files/blocks_snpsid_dict.pkl: Dictionary mapping SNP IDs to block IDs
-   - ../key_files/maf_all_samples.csv: Minor allele frequencies
+   - ../data/blocks_snpsid_dict.pkl: Dictionary mapping SNP IDs to block IDs
+   - ../data/maf_all_samples.csv: Minor allele frequencies
    - ../key_files/p0_average_seed_mix.csv: Seed mix data
    - ../key_files/var_pos_grenenet.csv: SNP position information
-   - /carnegie/nobackup/scratch/tbellagio/gea_grene-net/lfmm_full/lfmm_fullresults_all_k/lfmm_{biovar}_k25_results.csv: LFMM results
+   - ./lfmm_full/lfmm_fullresults_all_k/lfmm_{biovar}_k25_results.csv: LFMM results
 
 2. Script Files:
    - general_WZA_script_mod_polynomial_order7.py: WZA analysis script
@@ -49,7 +49,7 @@ import pickle
 
 # --- Load SNP and Block Mapping ---
 print("Loading SNP and block mapping...")
-dict_blocks = '../key_files/blocks_snpsid_dict.pkl'
+dict_blocks = '../data/blocks_snpsid_dict.pkl'
 
 with open(dict_blocks, 'rb') as file:
     dict_blocks = pickle.load(file)
@@ -58,16 +58,16 @@ reverse_mapping = {item: key for key, values in dict_blocks.items() for item in 
 
 # --- Load MAF Data ---
 print("Loading MAF data...")
-maf = pd.read_csv('../key_files/maf_all_samples.csv')
+maf = pd.read_csv('../data/maf_all_samples.csv')
 maf.columns = ['MAF']
 
 # --- Set Working Directory and Bioclimatic Variable ---
-wd = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/lfmm_full/lfmm_fullresults_all_k/'
+wd = './lfmm_full/lfmm_fullresults_all_k/'
 biovar = 'bio18'  # Can be modified for different bioclimatic variables
 
 # --- Process LFMM Results ---
 print(f"Processing LFMM results for {biovar}...")
-lfmm = f'/carnegie/nobackup/scratch/tbellagio/gea_grene-net/lfmm_full/lfmm_fullresults_all_k/lfmm_{biovar}_k25_results.csv'
+lfmm = f'./lfmm_full/lfmm_fullresults_all_k/lfmm_{biovar}_k25_results.csv'
 lfmm = pd.read_csv(lfmm)
 
 # Add MAF information
@@ -76,7 +76,7 @@ lfmm.to_csv(f'lfmm_{biovar}_results_all_samples_k25_wmaf.csv', index=None)
 
 # --- Create and Submit SLURM Job ---
 print("Creating SLURM job script...")
-path = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/wza'
+path = './wza'
 shfiles = []
 
 # Create SLURM job script

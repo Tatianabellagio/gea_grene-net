@@ -69,9 +69,16 @@ def fishers_method(p_values):
     
     return combined_p_value
 
+# --- Configuration and File Paths ---
+# Path to input files
+maf = pd.read_csv('../data/maf_all_samples.csv')
+dict_blocks = '../data/blocks_snpsid_dict.pkl'
+
+# Path to working directory
+path = './wza'
+
 # --- Set Parameters ---
 biovar = 'bio1'  # Can be modified for different bioclimatic variables
-path = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/wza'
 
 # --- Load and Process Data ---
 print(f"Loading Kendall Tau correlation results for {biovar}...")
@@ -129,5 +136,8 @@ for shfile in shfiles:
 # --- Load WZA Results ---
 print("Loading WZA results...")
 wza_df = pd.read_csv('before_filtering_wza_df.csv')
+
+# Change to the appropriate directory
+os.chdir(path)
 
 print("Script execution completed.")

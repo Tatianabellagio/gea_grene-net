@@ -1,9 +1,24 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
-# This script analyzes the relationship between SNP origin (approximated by association with temperature)
-# and allele frequency change (represented by the slope from binomial regression) for blocks of SNPs (Fig5)
-# and generates a hexbin plot with significant blocks highlighted.
+"""
+Allele Frequency Change vs Origin Analysis
+
+This script analyzes the relationship between allele frequency changes and their origin
+in the genome.
+
+Required Input Files:
+1. ../data/var_pos_grenenet.csv
+2. ../data/blocks_snpsid_dict.pkl
+3. ../data/1001g_regmap_grenet_ecotype_info_corrected_bioclim_2024May16.csv
+4. ../data/founder_ecotype_names.csv
+
+Output Files:
+1. allele_freq_change_vs_origin.csv
+   - Results of the analysis
+2. allele_freq_change_vs_origin.pdf
+   - Plot of the results
+"""
 
 # Import necessary libraries
 import pandas as pd
@@ -20,45 +35,29 @@ import pickle
 # Set matplotlib font type for PDF output
 matplotlib.rcParams['pdf.fonttype'] = 42
 
-# --- Required Input Files ---
-# Ensure these files are present relative to the script's location:
-# - ../key_files/var_pos_grenenet.csv
-# - ../key_files/blocks_snpsid_dict.pkl
-# - ../key_files/1001g_regmap_grenet_ecotype_info_corrected_bioclim_2024May16.csv
-# - ../key_files/founder_ecotype_names.csv
-# - ../gwas/greneNet_final_v1.1.recode.vcf.gz
-# - ../binomial_regression_lastgen/binomial_reg_lastgen_wmaf_bio1.csv
-# - ../wza_last_gen/wza_binomial_regression_bio1_poly7.csv
-# - ../signficant_intersection/sign_blocks_union_first_last_gen_BH_final.csv
-# - ../signficant_intersection/genes_info_BH_tair10.csv
+# --- Load Data ---
+# Load SNP positions
+snps_names = pd.read_csv('../data/var_pos_grenenet.csv')
 
-# --- Data Loading and Initial Processing ---
+# Load blocks dictionary
+with open('../data/blocks_snpsid_dict.pkl', 'rb') as f:
+    blocks_dict = pickle.load(f)
 
-# Read SNP names and positions
-# This file likely contains information about each SNP, including its position.
-snps_names = pd.read_csv('../key_files/var_pos_grenenet.csv')
+# Load climate data
+clim1001 = pd.read_csv('../data/1001g_regmap_grenet_ecotype_info_corrected_bioclim_2024May16.csv')
 
-# Load the dictionary mapping blocks to SNP IDs
-# This dictionary is used to group SNPs into larger genomic blocks.
-with open('../key_files/blocks_snpsid_dict.pkl', 'rb') as f:
-    dict_blocks = pickle.load(f)
+# Load founder ecotypes
+founder_ecotypes = pd.read_csv('../data/founder_ecotype_names.csv')['0'].values
 
+# --- Process Data ---
 # Create a reverse mapping from SNP ID to block identifier
-reverse_mapping = {item: key for key, values in dict_blocks.items() for item in values}
+reverse_mapping = {item: key for key, values in blocks_dict.items() for item in values}
 
 # Filter SNPs with sufficient allele data in the first generation
 snps_names = snps_names[snps_names['total_alleles05filter_firstgen'].notna()].reset_index(drop=True)
 
-# Read climate and ecotype information
-# This file contains environmental data (like temperature) for different ecotypes (strains).
-clim1001 = pd.read_csv('../key_files/1001g_regmap_grenet_ecotype_info_corrected_bioclim_2024May16.csv')
-
 # Convert ecotype ID to string for consistent merging/indexing
 clim1001['ecotypeid'] = clim1001['ecotypeid'].astype(str)
-
-# Read names of founder ecotypes
-# These are the ancestral strains used in the study.
-founder_ecotypes = pd.read_csv('../key_files/founder_ecotype_names.csv')['0'].values
 
 # Read VCF file containing genotype data
 # VCF (Variant Call Format) files store genetic variation data (SNPs) for individuals.
@@ -123,7 +122,7 @@ block_origin_bio1 = snp_origin_bio1.groupby('blocks')['snp_origin_bio1'].mean().
 binomial_reg = pd.read_csv('../binomial_regression_lastgen/binomial_reg_lastgen_wmaf_bio1.csv')
 
 # Filter SNPs with sufficient allele data in the last generation and get their IDs
-dict_snps_lastgen = pd.read_csv('../key_files/var_pos_grenenet.csv') # Re-read if needed, or use snps_names if it contains last gen info
+dict_snps_lastgen = pd.read_csv('../data/var_pos_grenenet.csv')  # Re-read if needed, or use snps_names if it contains last gen info
 binomial_reg_id = dict_snps_lastgen[dict_snps_lastgen['total_alleles05filter_lastgen'].notna()]['id'].reset_index(drop=True)
 
 # Add SNP IDs to the binomial regression results

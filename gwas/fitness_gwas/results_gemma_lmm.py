@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 """
@@ -20,16 +20,16 @@ Key steps include:
   and relating this to climatic distance.
 
 Inputs:
-- /carnegie/nobackup/scratch/tbellagio/gea_grene-net/key_files/var_pos_grenenet.csv: SNP position information.
-- /home/tbellagio/HapFM/blocks_snpsid_dict.pkl: Pickle file containing a dictionary mapping SNP IDs to block IDs.
-- /carnegie/nobackup/scratch/tbellagio/gea_grene-net/gwas/fitness_gwas/site_*/output/*.assoc.txt: GEMMA association results files.
-- ../../key_files/bioclimvars_experimental_sites_era5.csv: Climate data for experimental sites.
-- ../../key_files/generation_1_parallelism.txt: Parallelism data.
-- ../../key_files/unique_ecotypes.csv: Unique ecotype counts.
-- ../../key_files/shannon_div.csv: Shannon diversity data.
+- ../../data/var_pos_grenenet.csv: SNP position information.
+- ../../data/blocks_snpsid_dict.pkl: Pickle file containing a dictionary mapping SNP IDs to block IDs.
+- site_*/output/*.assoc.txt: GEMMA association results files.
+- ../../data/bioclimvars_experimental_sites_era5.csv: Climate data for experimental sites.
+- ../../data/generation_1_parallelism.txt: Parallelism data.
+- ../../data/unique_ecotypes.csv: Unique ecotype counts.
+- ../../data/shannon_div.csv: Shannon diversity data.
 
 Outputs:
-- For each site: /carnegie/nobackup/scratch/tbellagio/gea_grene-net/gwas/fitness_gwas/site_*/output/results_lmm.csv:
+- For each site: site_*/output/results_lmm.csv:
   Processed GEMMA results including significance status and block information.
 - Interactive Manhattan plots for each site.
 - Interactive scatter plots showing the relationship between the number of significant loci and
@@ -56,19 +56,19 @@ import statsmodels.api as sm
 
 # --- Configuration and Data Paths ---
 # Path to the base directory containing site-specific GEMMA results
-gemma_results_base_path = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/gwas/fitness_gwas'
+gemma_results_base_path = '.'
 
 # Path to SNP position information file
-snp_pos_file = '/carnegie/nobackup/scratch/tbellagio/gea_grene-net/key_files/var_pos_grenenet.csv'
+snp_pos_file = '../../data/var_pos_grenenet.csv'
 
 # Path to the pickle file containing block-SNP mapping dictionary
-blocks_dict_file = '/home/tbellagio/HapFM/blocks_snpsid_dict.pkl'
+blocks_dict_file = '../../data/blocks_snpsid_dict.pkl'
 
 # Paths to ecological data files
-climate_file = '../../key_files/bioclimvars_experimental_sites_era5.csv'
-parallelism_file = '../../key_files/generation_1_parallelism.txt'
-unique_ecotypes_file = '../../key_files/unique_ecotypes.csv'
-shannon_div_file = '../../key_files/shannon_div.csv'
+climate_file = '../../data/bioclimvars_experimental_sites_era5.csv'
+parallelism_file = '../../data/generation_1_parallelism.txt'
+unique_ecotypes_file = '../../data/unique_ecotypes.csv'
+shannon_div_file = '../../data/shannon_div.csv'
 
 # --- Load and Prepare Mapping Dictionaries ---
 print("Loading and preparing mapping dictionaries...")
@@ -118,7 +118,6 @@ for site in site_directories:
     
     # Determine significance and map to blocks
     assoc_df['significant'] = assoc_df['p_wald'] < bonferroni_threshold
-    # print(f"Site {site}: Significant SNPs count:\n{assoc_df['significant'].value_counts()}") # Optional: print counts
     
     # Map SNP rs ID to block ID using the inverse dictionary
     assoc_df['blocks'] = assoc_df['rs'].map(dict_blocks_inv)

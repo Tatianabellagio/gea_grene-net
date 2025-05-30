@@ -32,9 +32,10 @@ import os
 import pickle
 import dask.dataframe as dd
 
-# --- Load Mapping Dictionaries ---
-print("Loading mapping dictionaries...")
-dict_snps = pd.read_csv('/carnegie/nobackup/scratch/tbellagio/gea_grene-net/key_files/var_pos_grenenet.csv')
+# --- Load and Prepare Mapping Dictionaries ---
+print("Loading and preparing mapping dictionaries...")
+# Load SNP position information
+dict_snps = pd.read_csv('../../data/var_pos_grenenet.csv')
 
 with open('/home/tbellagio/HapFM/blocks_snpsid_dict.pkl', 'rb') as file:
     dict_blocks = pickle.load(file)
